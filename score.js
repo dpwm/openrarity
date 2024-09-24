@@ -7,7 +7,7 @@ import their_scores from './pulsephunks_scores.json' with { type: "json" };
 // openrank inserts this trait_type with the string value of the number of traits.
 // The number of traits therefore impacts on rarity of a token.
 // Without including this, we get different rarity results. The exact value of the string probably
-// doesn’t matter so much.
+// doesn’t matter so much as long as it cannot collide with user-provided attribute names.
 //
 const TRAIT_COUNT = 'meta_trait:trait_count';
 
@@ -22,14 +22,14 @@ metadata.collection.forEach(token => {
   trait_types[TRAIT_COUNT].add(token.attributes.length.toString());
 })
 
-// We convert the value sets to sorted arrays. This makes each trait_type an integer array.
+// We convert the value sets to sorted arrays of strings.
 const sorted_trait_types = Object.keys(trait_types).sort();
 sorted_trait_types.forEach(k => {
   trait_types[k] = [...trait_types[k]].sort();
 })
 
-// Take token metadata, extract the . This should return an array of ints. An integer of 0 is
-// equivalent to null.
+// Take token metadata, extract the attributes and convert them to an array. This should return an
+// array of ints. An integer of 0 is equivalent to the trait_type being unset.
 function get_attributes(x) {
   const attrs = Array(sorted_trait_types.length).fill(0);
   x.attributes.forEach(({ trait_type, value }) => {
